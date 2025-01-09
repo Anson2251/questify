@@ -1,0 +1,10 @@
+bin
+include
+lib
+pyvenv.cfg
+config.json
+.DS_Store
+papers/*
+syllabus/*
+*.pdf
+__pycache__
