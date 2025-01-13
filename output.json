@@ -1,0 +1,272 @@
+[
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.1.3",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "1a"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.1.5",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "1b"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.1.7",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "1c"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.1.10",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "1d-i"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.1.10",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "1d-ii"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.2.2",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "2a"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.3.2",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "2b-i"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.3.3",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "2b-ii"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "1.2.3",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "2c"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "4.1.7",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "3a"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "4.3.1",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "3b"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "8.1.3",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "4a"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "8.3.4",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "4b"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "8.3.5",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "4c"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "8.1.4",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "4d"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "2.1.6",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "5a-i"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "2.1.6",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "5a-ii"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "2.1.5",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "5b"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "2.1.11",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "5c-i"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "2.1.11",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "5c-ii"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "2.1.15",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "5d"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "3.2.3",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "6"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "3.1.8",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "7a"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "7.1.5",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "7b"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "3.1.8",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "7c"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "3.1.3",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "7d"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "5.1.4",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "7e-i"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "5.1.4",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "7e-ii"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "6.2.3",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "7f-i"
+    },
+    {
+        "matches": [
+            {
+                "syllabus-id": "6.1.6",
+                "relevance": 1.0
+            }
+        ],
+        "question-id": "7f-ii"
+    }
+]

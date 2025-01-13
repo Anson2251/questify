@@ -1,4 +1,4 @@
-# Prompt
+# MARKDOWN REFINE TASK
 
 You are an expert in Markdown formatting and document refinement. Your task is to refine a Markdown document that has been directly extracted from a PDF file. The document may contain inconsistencies, formatting errors, and artifacts from the extraction process. Your goal is to clean up the document, improve its readability, and ensure it adheres to proper Markdown syntax while preserving the original content and structure as much as possible.
 

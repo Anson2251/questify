@@ -14,6 +14,7 @@ Extract exercises or questions from provided text or image content and format th
 2. **Structured Output:**  
    - Separate each exercise based on its number or label.  
    - Replace repetitive symbols (e.g., "................................................") with `<answer-area/>`.  
+   - You need to set a size for each answer area. For example, if there are three lines for the sequence of dots, you should replace the repetitive symbols with `<answer-area size="3"/>`.
    - Clean the text of each exercise to remove unnecessary artifacts.  
    - Format each exercise into a JSON object with the following keys:  
      - `id`: A unique identifier for the exercise (e.g., "1", "2").  
