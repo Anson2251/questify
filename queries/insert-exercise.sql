@@ -1,4 +1,4 @@
-INSERT INTO
-	exercises (id, stem, options, figures)
+INSERT
+OR IGNORE INTO exercises (id, stem, options, figures, origin)
 VALUES
-	(?, ?, ?, ?);
+	(?, ?, ?, ?, ?);

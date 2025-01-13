@@ -18,6 +18,9 @@ Extract exercises or questions from provided text or image content and format th
    - Clean the text of each exercise to remove unnecessary artifacts.  
    - Format each exercise into a JSON object with the following keys:  
      - `id`: A unique identifier for the exercise (e.g., "1", "2").  
+
+         Note: For an exercise with multiple parts, use a hyphenated format (e.g., "1a-i" for Question 1, part (a), subpart (i)).  
+
      - `stem`: The main question or prompt, formatted in markdown. Include LaTeX for mathematical formulae.  
      - `options`: A list of unique option codes (e.g., "A", "B", "C") if applicable.  
      - `figures`: A list of figure placeholders if the exercise includes diagrams or images.  
@@ -48,7 +51,7 @@ Extract exercises or questions from provided text or image content and format th
 **Example Input:**  
 
 ```markdown
-Which of the following summarises the change in wave characteristics on going from infra-red to ultraviolet in the electromagnetic spectrum?  
+1 (a) (i) Which of the following summarises the change in wave characteristics on going from infra-red to ultraviolet in the electromagnetic spectrum?  
 |   | frequency | speed (in a vacuum) |  
 |---|---|---|  
 | A | decreases | decreases |  
@@ -67,7 +70,7 @@ Which of the following summarises the change in wave characteristics on going fr
 {
   "exercises": [
       {
-         "id": "1",
+         "id": "1a-i",
          "stem": "Which of the following summarises the change in wave characteristics on going from infra-red to ultraviolet in the electromagnetic spectrum?\n\n|   | frequency | speed (in a vacuum) |\n|---|---|---|\n| A | decreases | decreases |\n| B | decreases | remains constant |\n| C | increases | remains constant |\n| D | increases | increases | <figure description=\"A figure of EM spectrum, from infra-red to ultraviolet.\" id=\"em-spectrum\"/>",
          "options": ["A", "B", "C", "D"],
          "figures": ["em-spectrum"]

@@ -8,3 +8,6 @@ papers/*
 syllabus/*
 *.pdf
 __pycache__
+
+*.zip
+*.db

@@ -5,10 +5,10 @@ import pathlib
 import json
 import tqdm
 
-from utils import llm_chat, list_files, get_filename_with_other_ext
+from utils import llm_chat, list_files, get_filename_with_other_ext, get_paper_meta_prefix, get_paper_meta
 
 
-def extract_exercises_to_json(paper_md_text: str, client: OpenAI, model: str):
+def extract_exercises_to_json(paper_md_text: str, client: OpenAI, model: str, file_meta: dict = None):
 	"""
 	Extracts exercises from a PDF file and returns them as a JSON object.
 
@@ -97,6 +97,11 @@ def extract_exercises_to_json(paper_md_text: str, client: OpenAI, model: str):
 		exit_flag = True
 		extracted_exercises = extracted["exercises"]
 
+	# Use the given file meta to format the exercise id (adding meta prefix)
+	if file_meta is not None:
+		for exercise in extracted_exercises:
+			exercise["id"] = f'{get_paper_meta_prefix(file_meta["syllabus_id"], file_meta["time_id"], file_meta["component_id"])}-{exercise["id"]}'
+
 	return extracted_exercises
 
 def batch_extract_to_json(pdf_paths: list[str], client, model: str):
@@ -115,6 +120,8 @@ if __name__ == "__main__":
 
 	for file in files:
 		text = pymupdf4llm.to_markdown(file, show_progress=False)
-		extracted = extract_exercises_to_json(text, client, model)
+		(syllabus_id, time_id, component_id) =  get_paper_meta(file)
+		file_meta = {"syllabus_id": syllabus_id, "time_id": time_id, "component_id": component_id}
+		extracted = extract_exercises_to_json(text, client, model, file_meta)
 		pathlib.Path(get_filename_with_other_ext(file, "json")).write_text(json.dumps(extracted, indent=2, ensure_ascii=False))
 		progress_bar.update(1)
