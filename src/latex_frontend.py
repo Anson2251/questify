@@ -7,12 +7,6 @@ from mistune.util import strip_end
 from mistune.plugins.table import table
 from mistune.plugins.math import math
 
-#
-answer_area_regexp = re.compile(r'<answer-area size="(\d+)"\s*\/>')
-
-# <figure description="<string>" id="<string>"/>
-figure_regexp = re.compile(r'')
-
 def get_answer_area(size: int):
 	'''
 	<answer-area size="<integer>"/>
@@ -353,26 +347,5 @@ def markdown2latex(markdown_text: str) -> str:
     to parse and convert it into LaTeX format. The conversion is handled by a
     custom `LaTeXRenderer` which translates markdown elements (such as headings,
     links, images, etc.) into their corresponding LaTeX representations.
-
-    Parameters:
-    -----------
-    markdown_text : str
-        A string containing markdown-formatted text to be converted to LaTeX.
-
-    Returns:
-    --------
-    str
-        A string containing the LaTeX representation of the input markdown text.
-
-    Example:
-    --------
-    >>> markdown_text = '''
-    ... # Heading
-    ... This is a **bold** text.
-    ... '''
-    >>> latex_output = markdown2latex(markdown_text)
-    >>> print(latex_output)
-    \\section{Heading}
-    This is a \\textbf{bold} text. \\newline
     """
     return latex(markdown_text)
