@@ -7,23 +7,37 @@ from mistune.util import strip_end
 from mistune.plugins.table import table
 from mistune.plugins.math import math
 
-# <answer-area size="<integer>"/>
+#
 answer_area_regexp = re.compile(r'<answer-area size="(\d+)"\s*\/>')
 
 # <figure description="<string>" id="<string>"/>
-figure_regexp = re.compile(r'<figure description="([^"]+)" id="([^"]+)"\s*\/>')
+figure_regexp = re.compile(r'')
 
-def handle_custom_tags_to_latex(html_code: str):
-	answer_area_match = re.match(answer_area_regexp, html_code)
-	if answer_area_match:
-		size = int(answer_area_match.group(1))
-		return "\n\\newline" + "\n".join(["\\parbox[t][2em][c]{\\linewidth}{\\dotfill}"] * size)
+def get_answer_area(size: int):
+	'''
+	<answer-area size="<integer>"/>
+	'''
+	return "\\\\" + "\\newline\n".join(["\\parbox[t][2em][c]{\\linewidth}{\\dotfill}"] * size) + "\\\\"
 
-	figure_match = re.match(figure_regexp, html_code)
-	if figure_match:
-		description = figure_match.group(1)
-		id = figure_match.group(2)
-		return f"""
+def handle_answer_area(code: str, in_code_block = False):
+	pattern = re.compile(r'<answer-area size="(\d+)"\s*\/>')
+
+	exit_flag = False
+	while not exit_flag:
+		match = pattern.search(code)
+		if match:
+			size = int(match.group(1))
+			code = f"{code[:match.start()]}{r'\end{verbatim}' if in_code_block else ''}{get_answer_area(size) if (not in_code_block) else ('\\' + get_answer_area(size).strip("\\"))}{r'\begin{verbatim}' if in_code_block else ''}{code[match.end():]}"
+		else:
+			exit_flag = True
+	return code
+
+def get_figure(description: str, id: str):
+	'''
+	<figure description="<string>" id="<string>"/>
+	'''
+	return \
+f"""
 \\begin{{minipage}}[t]{{\\linewidth}}
   \\begin{{center}}
     \\fbox{{\\rule{{0pt}}{{2cm}} \\rule{{5cm}}{{0pt}}}}
@@ -33,18 +47,36 @@ def handle_custom_tags_to_latex(html_code: str):
 \\end{{minipage}}
 """
 
+def handle_figure(code: str, in_code_block = False):
+	pattern = re.compile(r'<figure description="([^"]+)" id="([^"]+)"\s*\/>')
+
+	exit_flag = False
+	while not exit_flag:
+		match = pattern.search(code)
+		if match:
+			(description, id) = match.groups()
+			code = f"{code[:match.start()]}{r'\end{verbatim}' if in_code_block else ''}{get_figure(description, id)}{r'\begin{verbatim}' if in_code_block else ''}{code[match.end():]}"
+		else:
+			exit_flag = True
+	return code
+
+def handle_custom_tags_to_latex(code: str, in_code_block = False):
+	code = handle_figure(code, in_code_block)
+	code = handle_answer_area(code, in_code_block)
+	return code
 
 def to_escaped_code(code: str) -> str:
-	return code.replace("\\", "\\textbackslash{}") \
-		.replace("{", "\\{") \
-		.replace("}", "\\}") \
-		.replace("$", "\\$") \
-		.replace("&", "\\&") \
-		.replace("#", "\\#") \
-		.replace("^", "\\^{}") \
-		.replace("_", "\\_") \
-		.replace("~", "\\~{}") \
-		.replace("%", "\\%") \
+	code = re.sub(r"(?<!\\)\\", '\\\\', code)
+	code = re.sub(r"(?<!\\){", '\\{', code)
+	code = re.sub(r"(?<!\\)}", '\\}', code)
+	code = re.sub(r"(?<!\\)\$", '\\$', code)
+	code = re.sub(r"(?<!\\)&", '\\&', code)
+	code = re.sub(r"(?<!\\)#", '\\#', code)
+	code = re.sub(r"(?<!\\)\^", '\\^', code)
+	code = re.sub(r"(?<!\\)_", '\\_', code)
+	code = re.sub(r"(?<!\\)~", '\\~', code)
+	code = re.sub(r"(?<!\\)%", '\\%', code)
+	return code
 
 def render_list(
 	renderer: "BaseRenderer", token: Dict[str, Any], state: "BlockState"
@@ -85,7 +117,7 @@ def _render_list_item(
 		else:
 			text += "\n"
 
-	return "\\item " + text.strip().rstrip("\\") + "\n"
+	return "\\item " + text.strip().strip("\\") + "\n"
 
 def _render_ordered_list(
 	renderer: "BaseRenderer", token: Dict[str, Any], state: "BlockState"
@@ -129,8 +161,9 @@ def generate_latex_table(table_dict):
 
 	header_cells = []
 	for cell in table_head["children"]:
-		header_cells.append("\\textbf{" + extract_text_from_cell(cell) + "}")
-	latex_table += " & ".join(header_cells) + " \\\\\n"
+		header_cells.append(extract_text_from_cell(cell))
+	print(header_cells)
+	latex_table += " & ".join([("\\textbf{" +to_escaped_code(h.strip()) + "}") for h in header_cells]) + " \\\\\n"
 	latex_table += "\\hline\n"
 	latex_table += "\\hline\n"
 
@@ -138,10 +171,10 @@ def generate_latex_table(table_dict):
 		row_cells = []
 		for cell in row["children"]:
 			row_cells.append(extract_text_from_cell(cell))
-		latex_table += " & ".join(row_cells) + " \\\\\n"
+		latex_table += " & ".join([to_escaped_code(c.strip()) for c in row_cells]) + " \\\\\n"
 		latex_table += "\\hline\n"
 
-	latex_table += "\\end{tabular}\n\\newline\\newline\n\n"
+	latex_table += "\\end{tabular}\n\\vspace{1em}\\newline\n\n"
 	return latex_table
 
 
@@ -222,22 +255,23 @@ class LaTeXRenderer(BaseRenderer):
 		# Escape special LaTeX characters in the code
 
 		# Use \texttt{} for inline code in LaTeX
-		return f"\\texttt{{{to_escaped_code(code)}}}"
+		return f"\\texttt{{{code}}}"
 
 	def linebreak(self, token: Dict[str, Any], state: BlockState) -> str:
-		return "\\\\\n % linebreak"
+		return "\\\\\n % linebreak\n"
 
 	def softbreak(self, token: Dict[str, Any], state: BlockState) -> str:
-		return "\\\\\n % softbreak"
+		return "\n"
 
 	def blank_line(self, token: Dict[str, Any], state: BlockState) -> str:
-		return "\n"
+		return ""
 
 	def inline_html(self, token: Dict[str, Any], state: BlockState) -> str:
 		# return cast(str, token["raw"])
 		tag_name = token["raw"].split(" ")[0][1:]
 		if(tag_name not in ["answer-area", "figure"]):
 			print("Unsupported inline HTML: ", token)
+			token["raw"] = f"<Unsupported inline HTML>\n{token['raw']}"
 			return self.block_code(token, state)
 		else:
 			return handle_custom_tags_to_latex(token["raw"])
@@ -245,7 +279,7 @@ class LaTeXRenderer(BaseRenderer):
 
 	def paragraph(self, token: Dict[str, Any], state: BlockState) -> str:
 		text = self.render_children(token, state)
-		return text + " \\newline\n"
+		return text + "\\newline % paragraph\n"
 
 	def heading(self, token: Dict[str, Any], state: BlockState) -> str:
 		level = cast(int, token["attrs"]["level"])
@@ -268,7 +302,7 @@ class LaTeXRenderer(BaseRenderer):
 
 	def block_text(self, token: Dict[str, Any], state: BlockState) -> str:
 		text = self.render_children(token, state)
-		return "{" + text + "}\\\\\n"
+		return f"\\\\{{{to_escaped_code(text)}}}\\\\\n"
 
 	def block_code(self, token: Dict[str, Any], state: BlockState) -> str:
 		attrs = token.get("attrs", {})
@@ -277,7 +311,7 @@ class LaTeXRenderer(BaseRenderer):
 		if code and code[-1] != "\n":
 			code += "\n"
 
-		return f"\\begin{{verbatim}}\n{to_escaped_code(code)}\\end{{verbatim}}\n\n"
+		return f"\\begin{{verbatim}}\n{handle_custom_tags_to_latex(code, True)}\\end{{verbatim}}\n\n"
 
 	def block_quote(self, token: Dict[str, Any], state: BlockState) -> str:
 		text = self.render_children(token, state)
@@ -287,6 +321,7 @@ class LaTeXRenderer(BaseRenderer):
 		tag_name = token["raw"].split(" ")[0][1:]
 		if(tag_name not in ["answer-area", "figure"]):
 			print("Unsupported inline HTML: ", token)
+			token["raw"] = f"<Unsupported block HTML>\n{token['raw']}"
 			return self.block_code(token, state)
 		else:
 			return handle_custom_tags_to_latex(token["raw"])

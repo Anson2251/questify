@@ -42,6 +42,10 @@ def into_document(latex_code: str, title: str):
 	latex = f"""
 \\documentclass{{article}}
 \\usepackage[a4paper, margin=1in]{{geometry}}
+\\usepackage{{caption}}
+\\usepackage{{amssymb}}
+\\DeclareUnicodeCharacter{{2713}}{{\\checkmark}}
+\\DeclareUnicodeCharacter{{2212}}{{-}}
 
 \\title{{{title}}}
 \\author{{{os.getlogin()}}}
@@ -55,7 +59,10 @@ def into_document(latex_code: str, title: str):
 \\end{{document}}
 """
 	latex = latex.strip()
-	return re.sub(pattern=r'(\\newline|\\\\)\s*(\\newline|\\\\)', repl="\\\\newline", string=latex)
+	regexp = re.compile(r'(\\newline|\\\\)\s*(\\newline|\\\\)')
+	while regexp.search(latex):
+		latex = regexp.sub("\\\\newline", latex)
+	return latex
 
 def compile_latex_to_pdf(latex_file, output_dir=None):
 	# Ensure the file exists
@@ -91,7 +98,11 @@ if __name__ == "__main__":
 	matched = [{"id": i[0], "description": markdown2latex(i[1]), "relevance": i[2]} for i in cursor.fetchall()]
 	latex = ""
 	counter = 0
+	if(len(matched) == 0):
+		print("No exercises matched the criteria.")
+		exit(1)
 	syllabus = matched[0]["id"].split("-")[0]
+	matched = {d["id"]: d for d in matched}.values()
 	for item in matched:
 		meta = item["id"].split("-")
 		header = f"[{meta[0]}/{meta[1]}/{meta[2]}/{'-'.join(meta[3:])}]"
@@ -105,7 +116,7 @@ if __name__ == "__main__":
 	create_dir_if_not_exist("compile")
 	create_dir_if_not_exist(path)
 	latex_file = path + "paper.tex"
-	pathlib.Path(latex_file).write_text(latex)
+	pathlib.Path(latex_file).write_text(latex, encoding="utf-8")
 	print("Compiled LaTeX file to: ", latex_file)
 	compile_latex_to_pdf(latex_file, path)
 
