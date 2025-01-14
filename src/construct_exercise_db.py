@@ -1,37 +1,24 @@
 import sqlite3
 from sqlite3 import Connection
 import pathlib
-from utils import list_files, get_filename_with_other_ext
+from utils import list_files, get_filename_with_other_ext, read_sql_file
 from exercise_classification import exercise_classification
 from openai import OpenAI
 import json
 from tqdm import tqdm
 
 
-def prepare_table(cursor: Connection):
-    schema = read_sql_file("queries/schema.sql")
-    cursor.executescript(schema)
+def prepare_table(connection: Connection):
+    schema = read_sql_file("src/queries/schema.sql")
+    connection.executescript(schema)
 
 
-def read_sql_file(path: str) -> str:
-    """
-    Reads the content of an SQL file from the specified path and returns it as a string.
-
-    Args:
-            path (str): The file path to the SQL file.
-
-    Returns:
-            str: The content of the SQL file as a string.
-    """
-    return pathlib.Path(path).read_text()
-
-
-def insert_exercise(cursor: Connection, exercise: dict):
-    cursor.execute("BEGIN TRANSACTION")
-    query = read_sql_file("queries/insert-exercise.sql")
+def insert_exercise(connection: Connection, exercise: dict):
+    connection.execute("BEGIN TRANSACTION")
+    query = read_sql_file("src/queries/insert-exercise.sql")
 
     try:
-        cursor.execute(
+        connection.execute(
             query,
             (
                 exercise["id"],
@@ -42,58 +29,58 @@ def insert_exercise(cursor: Connection, exercise: dict):
             ),
         )
     except Exception as e:
-        cursor.execute("ROLLBACK")
+        connection.execute("ROLLBACK")
         print("Fail to insert exercise due to", e)
         raise RuntimeError("Failed to insert exercise")
-    cursor.execute("COMMIT")
+    connection.execute("COMMIT")
 
 
-def insert_syllabus(cursor: Connection, syllabus: list[dict]):
-    cursor.execute("BEGIN TRANSACTION")
-    query = read_sql_file("queries/insert-syllabus-points.sql")
+def insert_syllabus(connection: Connection, syllabus: list[dict]):
+    connection.execute("BEGIN TRANSACTION")
+    query = read_sql_file("src/queries/insert-syllabus-points.sql")
 
     for point in syllabus:
         try:
-            cursor.execute(query, (point["id"], point["description"]))
+            connection.execute(query, (point["id"], point["description"]))
         except Exception as e:
-            cursor.execute("ROLLBACK")
+            connection.execute("ROLLBACK")
             print("Fail to insert syllabus point due to", e)
             raise RuntimeError("Failed to insert syllabus point")
-    cursor.execute("COMMIT")
+    connection.execute("COMMIT")
 
 
-def insert_matching(cursor: Connection, matching: list[dict]):
+def insert_matching(connection: Connection, matching: list[dict]):
     # exercise_id, syllabus_id, relevance
-    cursor.execute("BEGIN TRANSACTION")
-    query = read_sql_file("queries/insert-exercise-syllabus-mapping.sql")
+    connection.execute("BEGIN TRANSACTION")
+    query = read_sql_file("src/queries/insert-exercise-syllabus-mapping.sql")
 
     for match in matching:
         try:
-            cursor.execute(
+            connection.execute(
                 query, (match["question-id"], match["syllabus-id"], match["relevance"])
             )
         except Exception as e:
-            cursor.execute("ROLLBACK")
+            connection.execute("ROLLBACK")
             print("Fail to insert matching due to", e)
             raise RuntimeError("Failed to insert matching")
-    cursor.execute("COMMIT")
+    connection.execute("COMMIT")
 
 
-def insert_pdf_file(cursor: Connection, file_path: str, file_name: str = None):
+def insert_pdf_file(connection: Connection, file_path: str, file_name: str = None):
     if file_name == None:
         file_name = pathlib.Path(file_path).name
-    cursor.execute("BEGIN TRANSACTION")
-    query = read_sql_file("queries/insert-pdf-file.sql")
+    connection.execute("BEGIN TRANSACTION")
+    query = read_sql_file("src/queries/insert-pdf-file.sql")
 
     try:
         with open(file_path, "rb") as file:
             file_data = file.read()
 
-        cursor.execute(query, (file_name, file_data))
+        connection.execute(query, (file_name, file_data))
     except sqlite3.Error as e:
-        cursor.execute("ROLLBACK")
+        connection.execute("ROLLBACK")
         raise RuntimeError("Failed to insert pdf file " + file_path)
-    cursor.execute("COMMIT")
+    connection.execute("COMMIT")
 
 
 if __name__ == "__main__":
@@ -106,18 +93,16 @@ if __name__ == "__main__":
     )
     model = config["model"]
 
-    syllabus = json.loads(
-        pathlib.Path("syllabus/index-9618-2021-2023-syllabus-as.json").read_text()
-    )
+    syllabus = json.loads(pathlib.Path("syllabus/index-9618-2021-2023-syllabus-as.json").read_text())
     files = [file for file in list_files("papers") if file.endswith(".json")]
 
-    cursor = sqlite3.connect("./papers.db")
-    prepare_table(cursor)
-    insert_syllabus(cursor, syllabus["points"])
+    connection = sqlite3.connect("./papers.db")
+    prepare_table(connection)
+    insert_syllabus(connection, syllabus["points"])
 
     for file in tqdm(files):
         original_pdf_file = get_filename_with_other_ext(file, "pdf")
-        insert_pdf_file(cursor, original_pdf_file)
+        insert_pdf_file(connection, original_pdf_file)
 
         exercises = [
             {**e, **{"matching_syllabus": None, "origin": pathlib.Path(original_pdf_file).name}}
@@ -136,7 +121,7 @@ if __name__ == "__main__":
 
         for exercise in exercises:
             try:
-                insert_exercise(cursor, exercise)
+                insert_exercise(connection, exercise)
             except:
                 print("Warning: Fail to insert exercise: " + exercise["id"])
 
@@ -153,4 +138,4 @@ if __name__ == "__main__":
                     }
                 )
 
-        insert_matching(cursor, matchings)
+        insert_matching(connection, matchings)

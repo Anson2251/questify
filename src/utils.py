@@ -1,6 +1,19 @@
 
 from openai import OpenAI
 import os
+import pathlib
+
+def read_sql_file(path: str) -> str:
+    """
+    Reads the content of an SQL file from the specified path and returns it as a string.
+
+    Args:
+            path (str): The file path to the SQL file.
+
+    Returns:
+            str: The content of the SQL file as a string.
+    """
+    return pathlib.Path(path).read_text()
 
 def llm_chat(model: str, client: OpenAI, messages: list[dict[str, str]], json_enabled=True, max_tokens=2048):
 	"""
@@ -106,3 +119,16 @@ def get_paper_meta(file: str):
 
 def get_paper_meta_prefix(syllabus_id, time_id, component_id):
 	return f"{syllabus_id}-{time_id}-{component_id}"
+
+def create_dir_if_not_exist(dir_path: str):
+    """
+    Create a directory if it does not already exist.
+
+    Parameters
+    ----------
+    dir_path : str
+        The path to the directory to create.
+    """
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+

@@ -6,6 +6,7 @@ config.json
 .DS_Store
 papers/*
 syllabus/*
+compile
 *.pdf
 __pycache__
 

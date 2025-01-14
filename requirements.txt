@@ -3,3 +3,5 @@ pymupdf4llm
 tqdm
 openai
 zhipuai
+mistune
+httpx[socks]
