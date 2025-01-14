@@ -1,6 +1,6 @@
-bin
-include
-lib
+.venv
+
+
 pyvenv.cfg
 config.json
 .DS_Store

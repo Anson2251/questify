@@ -47,7 +47,7 @@ def exercise_classification(exercises: list[dict], syllabus_index: list[dict], c
 	messages.append({"role": "assistant", "content": response.choices[0].message.content})
 	messages.append({"role": "user", "content": json.dumps(exercises)})
 
-	response = llm_chat(model, client, messages)
+	response = llm_chat(model, client, messages, True, 8192)
 
 	return json.loads(response.choices[0].message.content)["classified"]
 
@@ -60,7 +60,7 @@ if __name__ == "__main__":
 	model = config["model"]
 	syllabus = json.loads(pathlib.Path(syllabus_index_path).read_text())
 
-	exercises = json.loads(pathlib.Path(exercise_json_path).read_text())["exercises"]
+	exercises = json.loads(pathlib.Path(exercise_json_path).read_text())
 	syllabus = json.loads(pathlib.Path(syllabus_index_path).read_text())["points"]
 
 	pathlib.Path("output.json").write_text(json.dumps(exercise_classification(exercises, syllabus, client, model)))

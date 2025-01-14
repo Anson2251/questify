@@ -44,11 +44,12 @@ For each exercise in the input array:
 
 1. Analyze the exercise's `stem` (and other fields if necessary) to determine its topic or focus.
 2. Search through the syllabus to find all relevant syllabus points that match the exercise's content. The match does not have to be entirely based on the alignment between the exercise's requirements and the syllabus point's description.
-3. Assign a **relevance score** (between 0 and 1) to each matched syllabus point, where:
-   - `1` means the syllabus point is fully relevant to the exercise.
-   - `0` means the syllabus point is not relevant to the exercise.
+3. Each exercise should at least have 4 syllabus points assigned to it, whatever the relevance score is.
+4. Assign a **relevance score** (between 0 (not included) and 1) to each matched syllabus point, where:
+   - `1` means the syllabus point is fully relevant to the exercise. (exactly matched)
+   - `0` means the syllabus point is not relevant to the exercise. (not matched at all)
    - Values between 0 and 1 indicate partial relevance.
-4. Record the classification result for the exercise, including the relevance scores.
+5. Record the classification result for the exercise, including the relevance scores.
 
 ---
 
