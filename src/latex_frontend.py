@@ -148,15 +148,16 @@ def generate_latex_table(table_dict):
 
 	num_columns = len(table_head["children"])
 
-	alignments = ["l"] * num_columns
+	alignments = ["c"] * num_columns
 
-	latex_table = "\n\\begin{tabular}{" + " ".join(alignments) + "}\n"
+	latex_table = "\n\\begin{tabularx}{\\linewidth}{" + "|".join(alignments) + "}\n"
 	latex_table += "\\hline\n"
 
 	header_cells = []
+
 	for cell in table_head["children"]:
 		header_cells.append(extract_text_from_cell(cell))
-	print(header_cells)
+
 	latex_table += " & ".join([("\\textbf{" +to_escaped_code(h.strip()) + "}") for h in header_cells]) + " \\\\\n"
 	latex_table += "\\hline\n"
 	latex_table += "\\hline\n"
@@ -165,10 +166,10 @@ def generate_latex_table(table_dict):
 		row_cells = []
 		for cell in row["children"]:
 			row_cells.append(extract_text_from_cell(cell))
-		latex_table += " & ".join([to_escaped_code(c.strip()) for c in row_cells]) + " \\\\\n"
+		latex_table += " & ".join([to_escaped_code(handle_custom_tags_to_latex(c.strip())) for c in row_cells]) + " \\\\\n"
 		latex_table += "\\hline\n"
 
-	latex_table += "\\end{tabular}\n\\vspace{1em}\\newline\n\n"
+	latex_table += "\\end{tabularx}\n\\vspace{1em}\\newline\n\n"
 	return latex_table
 
 
@@ -264,9 +265,8 @@ class LaTeXRenderer(BaseRenderer):
 		# return cast(str, token["raw"])
 		tag_name = token["raw"].split(" ")[0][1:]
 		if(tag_name not in ["answer-area", "figure"]):
-			print("Unsupported inline HTML: ", token)
-			token["raw"] = f"<Unsupported inline HTML>\n{token['raw']}"
-			return self.block_code(token, state)
+			print("Rendering inline HTML as codespan: \n\t", "\n\t".join(token["raw"].split("\n")))
+			return self.codespan(token, state)
 		else:
 			return handle_custom_tags_to_latex(token["raw"])
 
@@ -314,8 +314,7 @@ class LaTeXRenderer(BaseRenderer):
 	def block_html(self, token: Dict[str, Any], state: BlockState) -> str:
 		tag_name = token["raw"].split(" ")[0][1:]
 		if(tag_name not in ["answer-area", "figure"]):
-			print("Unsupported inline HTML: ", token)
-			token["raw"] = f"<Unsupported block HTML>\n{token['raw']}"
+			print("Rendering inline HTML as block code: \n\t", "\n\t".join(token["raw"].split("\n")))
 			return self.block_code(token, state)
 		else:
 			return handle_custom_tags_to_latex(token["raw"])
