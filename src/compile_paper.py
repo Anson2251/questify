@@ -21,7 +21,7 @@ def compile_latex(latex_file: str, output_dir: str = None):
 									directory as the LaTeX file.
 	"""
 	# Prepare the command with the output directory if specified
-	command = ['pdflatex', '-interaction=nonstopmode']
+	command = ['xelatex', '-interaction=nonstopmode']
 	if output_dir:
 		command.extend(['-output-directory', output_dir])
 	command.append(latex_file)
@@ -62,9 +62,6 @@ def into_document(latex_code: str, title: str):
 \\usepackage{{amssymb}}
 \\usepackage{{tabularx}}
 \\usepackage{{hyperref}}
-
-\\DeclareUnicodeCharacter{{2713}}{{\\checkmark}}
-\\DeclareUnicodeCharacter{{2212}}{{-}}
 
 \\title{{{title}}}
 \\author{{{os.getlogin()}}}
